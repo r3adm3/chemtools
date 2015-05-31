@@ -49,14 +49,14 @@
 		</div>	
 	</body>
 	
-	<script src="http://code.jquery.com/jquery-2.1.4.min.js">
+	<script src="http://code.jquery.com/jquery-1.11.3.min.js">
 	</script>
     <script src="highcharts.js"></script>
 	<script src="exporting.js"></script>
 	<script>
 	$(document).ready(function(){
 			
-		console.log("page ready");
+		//console.log("page ready");
 		reDrawGraph();
 
 	});
@@ -125,18 +125,18 @@
 			var massCell = parseInt($('table#massSpecData tbody tr#row' + i + ' td.ma').text())
 			var abunCell = parseInt($('table#massSpecData tbody tr#row' + i + ' td.ab').text())
 			if (isNaN(massCell) || isNaN(abunCell)) {
-				console.log ("massCell or abunCell is NaN")
+				//console.log ("massCell or abunCell is NaN")
 			} else {
 				dataTable.push([massCell,abunCell]);
 			}
 		}
-		console.log (dataTable);
+		//console.log (dataTable);
 		return dataTable;
 	}
 	
 	function reDrawGraph()
 	{
-	    console.log("entered redraw");
+	    //console.log("entered redraw");
 		
 		var myData = getDataFromTable();
 
@@ -147,7 +147,7 @@
 					spacing: [50,50,30,30]
 		        },
 		        title: {
-		            text: getNameofGraph(),
+		            text: getNameofGraph()
 		        },
 		        xAxis: {
 		            title: {
@@ -172,15 +172,14 @@
 		                dataLabels: {
 		                    align: 'right',
 		                    enabled: true
-		                },
-		                
+		                }
 		            }
 		        },
 		        series: [{
 		            data: myData
 		        }],
 		        exporting: {
-		            enabled: true,
+		            enabled: true
 		        }
 
 		    });
@@ -190,7 +189,7 @@
 			
 	function addRow(){
 			
-			console.log("addRow called");
+			//console.log("addRow called");
 			
 			var elementFragment = $("input#elementFragment").val();
 			var mass = $("input#mass").val();
@@ -198,18 +197,18 @@
 			var currentLastRow = findHighestRow();
 			var nextRow = currentLastRow + 1;
 			
-			console.log( elementFragment + "~" + mass + "~" + abundance);
+			//console.log( elementFragment + "~" + mass + "~" + abundance);
 		
 			$('table#massSpecData tr:last').after('<tr id="row' + nextRow + '"><td>' + elementFragment + '</td><td class="ma">' + mass + '</td><td class="ab">' + abundance + '</td><td><button type="submit" onclick="delRow('+ nextRow + ')">Delete</button></td></tr>' );
 			
-			console.log("here");
+			//console.log("here");
 			
 			reDrawGraph();
 			
 		}
 		
 	function delRow(rowNo){
-		console.log ("delRow called " + rowNo);
+		//console.log ("delRow called " + rowNo);
 		$('table#massSpecData tr#row' + rowNo).remove();
 		reDrawGraph();
 	}	
@@ -225,7 +224,7 @@
 									if (parseInt(id) > number) {
 										number = parseInt(id);
 										}
-									//console.log(id);
+									////console.log(id);
 									});
 		
 		return number;
