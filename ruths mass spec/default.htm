@@ -1,0 +1,209 @@
+<html>
+	<head>
+		<title>Simulated Mass Spec Generator</title>
+		<link rel="stylesheet" type="text/css" href="mystyles.css">
+			<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+	</head>
+		
+	<body>
+		
+		<h1 align='center'>Simulated Mass Spec Generator</h1>
+		<div id='intro' align='center'>This page makes Mass Spectrometry Plots using data inputted.</div>
+		<br><div id='wrapper'>
+			
+			<div id='datainput'>
+			<table>
+				<tr><td>Graph Name</td><td><input type="text" id="graphName"></input></td></tr>
+				<tr>
+					<td>Abundance Type (y-axis label)</td>
+					<td><input type="radio" name="yaxis" value="percentage" checked>Percentage</input><br>
+						<input type="radio" name="yaxis" value="relative">Relative</input>
+					</td>
+				</tr>
+			</table>
+			<input type="button" id="redraw" onclick="reDrawGraph()" value="Redraw Graph"></input>
+			<hr align="left">
+			Please input details of each molecule fragment:
+			<table>
+				<tr><td>Fragment:</td><td><input type="text" id="elementFragment"></input></td></tr>
+				<tr><td>Mass:</td><td><input type="text" id="mass"></input></td></tr>
+				<tr><td>Abundance:</td><td><input type="text" id="abundance"></input></td></tr>
+				
+			</table>
+			<input type="button" id="submit" onclick="addRow()" value="Submit"></input>
+			<hr align="left">
+			Table below will fill up with data
+			<table id="massSpecData">
+				<thead>
+					<tr><th>Fragment</th><th>Mass</th><th>Abundance</th><th>Delete?</th></tr>
+				</thead>
+				<tbody>
+					<tr id="row0"></tr> 
+				</tbody>
+			</table><br>
+			<hr align="left"><br></div>
+			<div id="container" style="width:640px; height:480px;"></div>
+		</div>	
+	</body>
+	
+	<script src="http://code.jquery.com/jquery-2.1.4.min.js">
+	</script>
+    <script src="highcharts.js"></script>
+	<script src="exporting.js"></script>
+	<script>
+	$(document).ready(function(){
+			
+		console.log("page ready");
+		reDrawGraph();
+
+	});
+	
+	function getYMax(){
+		
+		var ymax = null;
+		
+		if ($('input[name=yaxis]:checked').val() === "percentage"){
+			ymax = 100;	
+		}
+		
+		return ymax;
+	}
+	
+	function getAbundanceType(){
+		
+		var abundanceType = $('input[name=yaxis]:checked').val();
+		
+		return abundanceType;
+	}
+	
+	function getNameofGraph(){
+		
+		var graphName = "Mass Spec"
+		
+		if ($("input#graphName").val().length != 0){
+			graphName = $("input#graphName").val();
+		}
+		
+		return graphName;
+	}
+	
+	function getDataFromTable()
+	{
+		//var dataTable = [[1,3], [5,56], [34,34],[3,22]];
+		
+		var dataTable = [];
+		
+		for (i=1; i<=findHighestRow(); i++) {
+		
+			var massCell = parseInt($('table#massSpecData tbody tr#row' + i + ' td.ma').text())
+			var abunCell = parseInt($('table#massSpecData tbody tr#row' + i + ' td.ab').text())
+			if (isNaN(massCell) || isNaN(abunCell)) {
+				console.log ("massCell or abunCell is NaN")
+			} else {
+				dataTable.push([massCell,abunCell]);
+			}
+		}
+		console.log (dataTable);
+		return dataTable;
+	}
+	
+	function reDrawGraph()
+	{
+	    console.log("entered redraw");
+		
+		var myData = getDataFromTable();
+
+		$(function () {
+		    $('#container').highcharts({
+		        chart: {
+		            type: 'column'
+		        },
+		        title: {
+		            text: getNameofGraph(),
+		        },
+		        xAxis: {
+		            title: {
+		                text: 'm/z'
+		            },
+		            minPadding: 0.05,
+		            maxPadding: 0.05
+		        },
+		        yAxis: {
+		            title:{
+		                text: getAbundanceType() + ' abundance'
+		            },
+					max: getYMax()
+		        },
+		        legend:{
+		            enabled: false
+		        },
+		        plotOptions:{
+		            series:{
+		                pointWidth: 2,
+		                dataLabels: {
+		                    align: 'right',
+		                    enabled: true
+		                },
+		                
+		            }
+		        },
+		        series: [{
+		            data: myData
+		        }],
+		        exporting: {
+		            enabled: true
+		        }
+
+		    });
+		});
+		
+	}
+			
+	function addRow(){
+			
+			console.log("addRow called");
+			
+			var elementFragment = $("input#elementFragment").val();
+			var mass = $("input#mass").val();
+			var abundance = $("input#abundance").val();
+			var currentLastRow = findHighestRow();
+			var nextRow = currentLastRow + 1;
+			
+			console.log( elementFragment + "~" + mass + "~" + abundance);
+		
+			$('table#massSpecData tr:last').after('<tr id="row' + nextRow + '"><td>' + elementFragment + '</td><td class="ma">' + mass + '</td><td class="ab">' + abundance + '</td><td><button type="submit" onclick="delRow('+ nextRow + ')">Delete</button></td></tr>' );
+			
+			console.log("here");
+			
+			reDrawGraph();
+			
+		}
+		
+	function delRow(rowNo){
+		console.log ("delRow called " + rowNo);
+		$('table#massSpecData tr#row' + rowNo).remove();
+		reDrawGraph();
+	}	
+	
+	function findHighestRow(){
+		
+		var number = 0;
+		
+		$("table#massSpecData tbody tr").each( function()
+								{ 
+									var id = $(this).attr('id'); 
+									id = id.replace("row", "");
+									if (parseInt(id) > number) {
+										number = parseInt(id);
+										}
+									//console.log(id);
+									});
+		
+		return number;
+	}
+	
+	
+	</script>
+		
+</html>
+
