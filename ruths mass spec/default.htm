@@ -240,6 +240,13 @@
 		return true;
 	
 	}
+	
+	//catch any javascript popup failures. 
+	 window.onerror = function(msg, url, linenumber) {
+        logToServer('Error message: '+msg+', URL: '+url+', Line Number: '+ linenumber);
+        return true;
+    }
+	
 	</script>
 		
 </html>
